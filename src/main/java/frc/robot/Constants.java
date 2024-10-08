@@ -16,5 +16,12 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kAuxControllerPort = 1;
+
+    public static final int LEFT_STICK_X = 0;
+    public static final int LEFT_STICK_Y = 1;
+    public static final int LEFT_TRIGGER = 2;
+    public static final int RIGHT_STICK_X = 3;
+    public static final int RIGHT_STICK_Y = 4;
+    public static final int RIGHT_TRGGER = 5;
   }
 }
