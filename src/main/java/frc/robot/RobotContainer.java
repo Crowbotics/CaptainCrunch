@@ -5,9 +5,11 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Autonomous;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Dumpy;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,6 +34,8 @@ public class RobotContainer {
       new CommandGenericHID(OperatorConstants.kAuxControllerPort);
 
   private final DrivetrainSubsystem m_drive = new DrivetrainSubsystem();
+  private final Dumpy m_dumpy = new Dumpy();
+  private final Command m_auto = new Autonomous(10, .5, m_drive, m_dumpy);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -42,11 +46,10 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         Commands.run(
-            () ->
-                m_drive.arcadeDrive(
-                    -m_driverGamepad.getRawAxis(1), -m_driverGamepad.getRawAxis(4)),
-            m_drive));
-    
+            () -> m_drive.arcadeDrive(
+                    -m_driverGamepad.getRawAxis(1),
+                    -m_driverGamepad.getRawAxis(4)),
+                    m_drive));
   }
 
   /**
@@ -66,6 +69,21 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     //m_driverGamepad.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    m_driverGamepad
+    .axisGreaterThan(2, .5)
+    .whileTrue(Commands.run(
+      () -> m_dumpy.run_back_intake(m_driverGamepad.getRawAxis(2))));
+
+    m_driverGamepad
+    .axisGreaterThan(3, .5)
+    .whileTrue(Commands.run(
+      () -> m_dumpy.run_front_intake(m_driverGamepad.getRawAxis(3))));
+
+    m_driverGamepad.axisLessThan(2,.5)
+    .and(m_driverGamepad.axisLessThan(3,.5))
+    .whileTrue(Commands.run(
+      ()-> m_dumpy.stop_intake()));
   }
 
   /**
@@ -75,6 +93,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return m_auto;
   }
 }
